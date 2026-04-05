@@ -732,6 +732,59 @@
 
   .ts-tab:hover { color: var(--white); background: rgba(255,255,255,0.06); }
   .ts-tab.active { background: var(--red); color: white; }
+
+  /* ── BRAND DEAL STEPS ── */
+  .bd-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .bd-step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--dark-3);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mid);
+    transition: all 0.2s;
+  }
+
+  .bd-step.active .bd-step-num {
+    background: var(--red);
+    border-color: var(--red);
+    color: white;
+  }
+
+  .bd-step.done .bd-step-num {
+    background: var(--green);
+    border-color: var(--green);
+    color: white;
+  }
+
+  .bd-step-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--mid);
+  }
+
+  .bd-step.active .bd-step-label { color: var(--white); }
+
+  .bd-step-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+    margin: 0 8px;
+    margin-bottom: 22px;
+    min-width: 40px;
+  }
 </style>
 </head>
 <body>
@@ -786,6 +839,10 @@
     </button>
     <button class="sidebar-item" onclick="showPage('shorts',null,this)">
       <span class="sidebar-dot"></span> Shorts Producer
+    </button>
+    <button class="sidebar-item" onclick="showPage('branddeals',null,this)">
+      <span class="sidebar-dot" style="background:#EF9F27;"></span> Brand Deals
+      <span class="sidebar-badge" style="background:#BA7517;">NEW</span>
     </button>
   </div>
   <div class="sidebar-section">
@@ -1557,6 +1614,201 @@
     </div>
   </div>
 
+  <!-- ── BRAND DEAL PAGE ── -->
+  <div class="page" id="page-branddeals">
+    <div class="page-header">
+      <div class="page-label">BRAND PARTNERSHIPS</div>
+      <div class="page-title">Brand Deal Agent</div>
+      <div class="page-sub">Product-only deals · Full creative control · YouTube long form + TikTok shorts</div>
+    </div>
+
+    <!-- STEP INDICATOR -->
+    <div style="display:flex; align-items:center; gap:0; margin-bottom:2rem;">
+      <div class="bd-step active" id="bd-step-1">
+        <div class="bd-step-num">1</div>
+        <div class="bd-step-label">Product info</div>
+      </div>
+      <div class="bd-step-line"></div>
+      <div class="bd-step" id="bd-step-2">
+        <div class="bd-step-num">2</div>
+        <div class="bd-step-label">Your take</div>
+      </div>
+      <div class="bd-step-line"></div>
+      <div class="bd-step" id="bd-step-3">
+        <div class="bd-step-num">3</div>
+        <div class="bd-step-label">Content plan</div>
+      </div>
+      <div class="bd-step-line"></div>
+      <div class="bd-step" id="bd-step-4">
+        <div class="bd-step-num">4</div>
+        <div class="bd-step-label">Calendar</div>
+      </div>
+    </div>
+
+    <!-- STEP 1 — PRODUCT INFO -->
+    <div id="bd-panel-1">
+      <div class="two-col" style="margin-bottom:16px;">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📦 PRODUCT DETAILS</span>
+            <span class="pill amber">Step 1 of 4</span>
+          </div>
+          <div class="card-body">
+            <label class="form-label">BRAND NAME</label>
+            <input class="tmv-input" id="bd-brand" placeholder="e.g. Rode, DJI, Elgato, SmallRig">
+
+            <label class="form-label">PRODUCT NAME</label>
+            <input class="tmv-input" id="bd-product" placeholder="e.g. Rode Wireless PRO, DJI RS4 Mini">
+
+            <label class="form-label">PRODUCT PAGE URL</label>
+            <input class="tmv-input" id="bd-url" placeholder="https://www.rode.com/wireless-pro">
+
+            <label class="form-label">PRODUCT CATEGORY</label>
+            <select class="tmv-input tmv-select" id="bd-category">
+              <option>Camera microphone / audio</option>
+              <option>Camera stabilizer / gimbal</option>
+              <option>Camera lighting</option>
+              <option>Camera accessory / rig</option>
+              <option>Camera body</option>
+              <option>Camera lens</option>
+              <option>Streaming gear</option>
+              <option>Editing software / app</option>
+              <option>Storage / memory</option>
+              <option>Other camera gear</option>
+            </select>
+
+            <label class="form-label">RETAIL PRICE</label>
+            <input class="tmv-input" id="bd-price" placeholder="e.g. $299">
+
+            <label class="form-label">PASTE PRODUCT PAGE DESCRIPTION (copy from their website)</label>
+            <textarea class="tmv-input tmv-textarea" id="bd-desc" placeholder="Copy and paste the product description, key features, and specs from the brand's product page. The more you paste, the better the agent understands the product..." style="min-height:120px;"></textarea>
+
+            <button class="btn btn-primary" style="width:100%;" onclick="bdNextStep(2)">Next — add your take →</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">📋 ACTIVE BRAND DEALS</span></div>
+          <div class="card-body">
+            <div id="bd-active-deals">
+              <div style="font-size:12px; color:var(--mid); text-align:center; padding:1rem 0;">No active deals yet. Add your first product above.</div>
+            </div>
+            <div class="divider"></div>
+            <div class="card-header" style="padding:0; border:none; margin-bottom:10px;"><span class="card-title">💡 BRAND DEAL TIPS</span></div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <div class="brief-section">
+                <div class="brief-section-title">USE IT FOR A WEEK FIRST</div>
+                <div class="brief-section-body">Real opinions convert. Viewers can tell when you haven't actually used something. Use the product daily for 7 days before filming.</div>
+              </div>
+              <div class="brief-section">
+                <div class="brief-section-title">FTC DISCLOSURE</div>
+                <div class="brief-section-body">Always disclose at the start: "This product was sent to me by [brand] for review." Even product-only deals require disclosure.</div>
+              </div>
+              <div class="brief-section">
+                <div class="brief-section-title">UPGRADE TO PAID</div>
+                <div class="brief-section-body">After delivering great content, send the brand your stats and ask for a paid partnership next time. Product deals are your audition.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 — YOUR TAKE -->
+    <div id="bd-panel-2" style="display:none;">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header">
+          <span class="card-title">🎯 YOUR HONEST TAKE — After one week of use</span>
+          <span class="pill amber">Step 2 of 4</span>
+        </div>
+        <div class="card-body">
+          <div class="three-col">
+            <div>
+              <label class="form-label">WHAT YOU LOVED</label>
+              <textarea class="tmv-input tmv-textarea" id="bd-loved" placeholder="What genuinely impressed you? What worked better than expected? What would you tell a friend?" style="min-height:90px;"></textarea>
+            </div>
+            <div>
+              <label class="form-label">WHAT COULD BE BETTER</label>
+              <textarea class="tmv-input tmv-textarea" id="bd-issues" placeholder="Be honest. What didn't work great? What limitations did you find? This is what builds trust with your audience." style="min-height:90px;"></textarea>
+            </div>
+            <div>
+              <label class="form-label">WHO SHOULD BUY THIS</label>
+              <textarea class="tmv-input tmv-textarea" id="bd-who" placeholder="Which creator / photographer / filmmaker is this perfect for? Who should skip it? Be specific." style="min-height:90px;"></textarea>
+            </div>
+          </div>
+          <div class="two-col" style="margin-top:10px;">
+            <div>
+              <label class="form-label">YOUR OVERALL VERDICT</label>
+              <select class="tmv-input tmv-select" id="bd-verdict">
+                <option>Highly recommend — buy it</option>
+                <option>Recommend with caveats — know what you're getting</option>
+                <option>Depends on your setup — here's who should get it</option>
+                <option>Pass — here's what I'd buy instead</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">COMPETING PRODUCT TO COMPARE (optional)</label>
+              <input class="tmv-input" id="bd-competitor" placeholder="e.g. DJI Mic 2, Hollyland Lark M2">
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-secondary" onclick="bdNextStep(1)">← Back</button>
+            <button class="btn btn-primary" onclick="generateBrandDealPlan()">Generate content plan →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 — CONTENT PLAN -->
+    <div id="bd-panel-3" style="display:none;">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header">
+          <span class="card-title">🎬 GENERATED CONTENT PLAN</span>
+          <span class="pill green">Step 3 of 4</span>
+        </div>
+        <div class="card-body" id="bd-plan-output">
+          <div style="text-align:center; padding:2rem;">
+            <span class="loading"></span> Generating your content plan...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 — CALENDAR -->
+    <div id="bd-panel-4" style="display:none;">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header">
+          <span class="card-title">📅 ADD TO CONTENT CALENDAR</span>
+          <span class="pill blue">Step 4 of 4</span>
+        </div>
+        <div class="card-body">
+          <div class="three-col" style="margin-bottom:16px;">
+            <div>
+              <label class="form-label">LONG FORM PUBLISH DATE</label>
+              <input class="tmv-input" id="bd-lf-date" type="date">
+            </div>
+            <div>
+              <label class="form-label">FIRST SHORT PUBLISH DATE</label>
+              <input class="tmv-input" id="bd-sf-date" type="date">
+            </div>
+            <div>
+              <label class="form-label">FILM DATE</label>
+              <input class="tmv-input" id="bd-film-date" type="date">
+            </div>
+          </div>
+
+          <div id="bd-calendar-preview" style="margin-bottom:16px;"></div>
+
+          <div class="btn-row">
+            <button class="btn btn-secondary" onclick="bdNextStep(3)">← Back to plan</button>
+            <button class="btn btn-primary" onclick="addToCalendar()">Add to TMV Content Calendar →</button>
+          </div>
+          <div class="output-box" id="bd-calendar-output"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </main>
 </div>
 
@@ -1841,7 +2093,224 @@ Keep each tight, punchy, and affiliate-aware. No intros. Hard cuts.`;
   }
 }
 
-// ── TREND SCOUT TAB SWITCHER ──
+// ── BRAND DEAL AGENT ──
+let bdCurrentPlan = '';
+let bdActiveDeal = {};
+
+function bdNextStep(step) {
+  [1,2,3,4].forEach(n => {
+    const panel = document.getElementById('bd-panel-' + n);
+    const stepEl = document.getElementById('bd-step-' + n);
+    if (panel) panel.style.display = n === step ? 'block' : 'none';
+    if (stepEl) {
+      stepEl.classList.remove('active','done');
+      if (n === step) stepEl.classList.add('active');
+      if (n < step) stepEl.classList.add('done');
+    }
+  });
+}
+
+async function generateBrandDealPlan() {
+  const brand = document.getElementById('bd-brand').value || 'the brand';
+  const product = document.getElementById('bd-product').value || 'the product';
+  const category = document.getElementById('bd-category').value;
+  const price = document.getElementById('bd-price').value || 'price TBD';
+  const desc = document.getElementById('bd-desc').value || '';
+  const loved = document.getElementById('bd-loved').value || '';
+  const issues = document.getElementById('bd-issues').value || '';
+  const who = document.getElementById('bd-who').value || '';
+  const verdict = document.getElementById('bd-verdict').value;
+  const competitor = document.getElementById('bd-competitor').value || '';
+
+  bdActiveDeal = { brand, product, category, price, verdict };
+
+  bdNextStep(3);
+
+  const prompt = `You are the TMV Visual Media Brand Deal Agent. Generate a complete content plan for Victor Lopez.
+
+PRODUCT: ${product} by ${brand}
+CATEGORY: ${category}
+PRICE: ${price}
+PRODUCT INFO: ${desc}
+
+VICTOR'S HONEST TAKE (after one week of use):
+- What he loved: ${loved}
+- Issues found: ${issues}
+- Who should buy it: ${who}
+- Overall verdict: ${verdict}
+- Competing product: ${competitor || 'none specified'}
+
+Generate a complete content plan with these exact sections:
+
+## LONG FORM VIDEO (YouTube)
+TITLE: (use a current trending format — vs, time promise, actually frame, honest warning)
+HOOK (first 30 seconds): (cold open, no intro, straight into it — TMV style)
+VIDEO STRUCTURE: (5-7 bullet points covering what to film in order)
+SHOT LIST: (specific shots needed — face to camera, B-roll, product close-ups, comparison shots)
+AFFILIATE ANGLE: (how to naturally mention where to buy + disclosure language)
+ESTIMATED LENGTH: (minutes)
+
+## SHORT 1 — TikTok/YouTube Shorts
+TITLE: (punchy, under 8 words)
+HOOK: (exact first line, cold open)
+SCRIPT: (full 30-45 second script)
+SHOT TYPE: (face/mix/product B-roll)
+
+## SHORT 2 — TikTok/YouTube Shorts
+TITLE:
+HOOK:
+SCRIPT:
+SHOT TYPE:
+
+## SHORT 3 — TikTok/YouTube Shorts
+TITLE:
+HOOK:
+SCRIPT:
+SHOT TYPE:
+
+## FTC DISCLOSURE
+(exact disclosure language for YouTube description and TikTok caption)
+
+## CAPTION TEMPLATES
+YouTube description opening (2-3 sentences)
+TikTok caption with hashtags
+
+Keep everything in TMV voice — friendly, direct, honest, bottom-of-funnel. Give verdicts early. No fluff.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content.map(c => c.text || '').join('');
+    bdCurrentPlan = text;
+
+    const formatted = text
+      .replace(/## (.*?)$/gm, '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--red);margin:20px 0 8px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.06);">$1</div>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--white);">$1</strong>')
+      .replace(/^(TITLE|HOOK|SCRIPT|SHOT LIST|SHOT TYPE|VIDEO STRUCTURE|AFFILIATE ANGLE|ESTIMATED LENGTH):/gm, '<span style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--mid);">$1:</span>')
+      .replace(/\n/g, '<br>');
+
+    document.getElementById('bd-plan-output').innerHTML = `
+      <div style="margin-bottom:16px;">${formatted}</div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="copyBdPlan()">Copy full plan</button>
+        <button class="btn btn-primary" onclick="bdNextStep(4); buildCalendarPreview()">Add to calendar →</button>
+      </div>`;
+
+    // Add to active deals sidebar
+    const dealsEl = document.getElementById('bd-active-deals');
+    dealsEl.innerHTML = `
+      <div style="padding:10px; background:var(--dark-3); border-radius:8px; border-left:3px solid #EF9F27;">
+        <div style="font-size:13px; font-weight:600; color:var(--white); margin-bottom:2px;">${product}</div>
+        <div style="font-size:11px; color:var(--mid);">by ${brand} · ${category}</div>
+        <div style="font-size:11px; color:#F5C26B; margin-top:4px;">${verdict}</div>
+      </div>`;
+
+  } catch(e) {
+    document.getElementById('bd-plan-output').innerHTML = `
+      <div style="margin-bottom:12px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--red);margin-bottom:8px;">LONG FORM VIDEO (YouTube)</div>
+        <strong style="color:var(--white);">TITLE:</strong> I used the ${product} for 30 days — here's my honest verdict<br><br>
+        <strong style="color:var(--white);">HOOK:</strong> "${product} landed on my desk last month. I've been using it every single day since. Here's exactly what I think — who should buy it and who should skip it."<br><br>
+        <strong style="color:var(--white);">SHOT LIST:</strong><br>
+        • Face to camera cold open — deliver verdict in first 30 seconds<br>
+        • Product unboxing / first look B-roll<br>
+        • In-use demo shots — show it working with your Canon setup<br>
+        • Close-up detail shots of key features<br>
+        • Side-by-side comparison if applicable<br>
+        • Face to camera for pros/cons section<br>
+        • Final verdict face to camera<br><br>
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--red);margin:16px 0 8px;">SHORT 1</div>
+        <strong style="color:var(--white);">TITLE:</strong> Is the ${product} worth it?<br>
+        <strong style="color:var(--white);">HOOK:</strong> "${brand} sent me this. Here's my honest take after a week."<br><br>
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--red);margin:16px 0 8px;">FTC DISCLOSURE</div>
+        "This product was provided by ${brand} for review. All opinions are my own."
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="bdNextStep(4); buildCalendarPreview()">Add to calendar →</button>
+      </div>`;
+  }
+}
+
+function copyBdPlan() {
+  navigator.clipboard.writeText(bdCurrentPlan).catch(() => {});
+}
+
+function buildCalendarPreview() {
+  const product = document.getElementById('bd-product').value || 'Brand deal product';
+  const brand = document.getElementById('bd-brand').value || 'Brand';
+
+  // Set default dates
+  const today = new Date();
+  const filmDate = new Date(today); filmDate.setDate(today.getDate() + 2);
+  const sfDate = new Date(today); sfDate.setDate(today.getDate() + 4);
+  const lfDate = new Date(today); lfDate.setDate(today.getDate() + 7);
+
+  document.getElementById('bd-film-date').value = filmDate.toISOString().split('T')[0];
+  document.getElementById('bd-sf-date').value = sfDate.toISOString().split('T')[0];
+  document.getElementById('bd-lf-date').value = lfDate.toISOString().split('T')[0];
+
+  document.getElementById('bd-calendar-preview').innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <div style="padding:10px 14px; background:var(--dark-3); border-radius:8px; border-left:3px solid #EF9F27; display:flex; align-items:center; justify-content:space-between;">
+        <div>
+          <div style="font-size:12px; font-weight:600; color:var(--white);">Film day — ${product}</div>
+          <div style="font-size:11px; color:var(--mid);">Long form + all 3 shorts in one session</div>
+        </div>
+        <span class="pill amber">Film</span>
+      </div>
+      <div style="padding:10px 14px; background:var(--dark-3); border-radius:8px; border-left:3px solid #7BC244; display:flex; align-items:center; justify-content:space-between;">
+        <div>
+          <div style="font-size:12px; font-weight:600; color:var(--white);">Publish Short 1 — TikTok</div>
+          <div style="font-size:11px; color:var(--mid);">${brand} review short · Tag brand</div>
+        </div>
+        <span class="pill green">Publish</span>
+      </div>
+      <div style="padding:10px 14px; background:var(--dark-3); border-radius:8px; border-left:3px solid #7BC244; display:flex; align-items:center; justify-content:space-between;">
+        <div>
+          <div style="font-size:12px; font-weight:600; color:var(--white);">Publish Short 2 + 3 — TikTok</div>
+          <div style="font-size:11px; color:var(--mid);">${brand} review shorts · Space them 1 day apart</div>
+        </div>
+        <span class="pill green">Publish</span>
+      </div>
+      <div style="padding:10px 14px; background:var(--dark-3); border-radius:8px; border-left:3px solid var(--red); display:flex; align-items:center; justify-content:space-between;">
+        <div>
+          <div style="font-size:12px; font-weight:600; color:var(--white);">Publish Long Form — YouTube</div>
+          <div style="font-size:11px; color:var(--mid);">${product} full review · Include FTC disclosure</div>
+        </div>
+        <span class="pill red">Main video</span>
+      </div>
+    </div>`;
+}
+
+function addToCalendar() {
+  const product = document.getElementById('bd-product').value || 'Brand deal';
+  const brand = document.getElementById('bd-brand').value || 'Brand';
+  const filmDate = document.getElementById('bd-film-date').value;
+  const sfDate = document.getElementById('bd-sf-date').value;
+  const lfDate = document.getElementById('bd-lf-date').value;
+  const out = document.getElementById('bd-calendar-output');
+
+  out.style.display = 'block';
+  out.innerHTML = `
+    <strong style="color:var(--white);">✅ Added to TMV Content Calendar</strong><br><br>
+    Film day: ${filmDate || 'TBD'}<br>
+    Shorts publish: ${sfDate || 'TBD'} (stagger 1 day apart)<br>
+    Long form publish: ${lfDate || 'TBD'}<br><br>
+    <strong style="color:var(--red-light);">Next steps:</strong><br>
+    1. Open your TMV Content Calendar Google Sheet<br>
+    2. Add these dates manually for now<br>
+    3. Copy your content plan above into the notes column<br>
+    4. Tag the row as "Brand Deal — ${brand}"<br><br>
+    <em style="color:var(--mid); font-size:11px;">Auto-population to Google Sheets coming in Phase 2.</em>`;
+}
 function switchTsTab(tab, btn) {
   document.querySelectorAll('.ts-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
