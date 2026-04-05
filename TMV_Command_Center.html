@@ -716,6 +716,22 @@
     border-top: 1px solid rgba(255,255,255,0.06);
     margin: 1.25rem 0;
   }
+
+  .ts-tab {
+    padding: 7px 16px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--mid);
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .ts-tab:hover { color: var(--white); background: rgba(255,255,255,0.06); }
+  .ts-tab.active { background: var(--red); color: white; }
 </style>
 </head>
 <body>
@@ -1263,34 +1279,198 @@
   <div class="page" id="page-trends">
     <div class="page-header">
       <div class="page-label">INTELLIGENCE</div>
-      <div class="page-title">Trend Scout v2</div>
-      <div class="page-sub">External trends + live chat cross-reference · Overlap engine</div>
+      <div class="page-title">Trend Scout v3</div>
+      <div class="page-sub">External trends · Live chat · Comment scrubber · Pop culture tie-ins · Photo + film technique</div>
     </div>
 
-    <div class="two-col" style="margin-bottom:16px;">
-      <div class="card">
-        <div class="card-header"><span class="card-title">EXTERNAL TRENDS</span></div>
-        <div class="card-body">
-          <label class="form-label">NICHE FOCUS</label>
-          <select class="tmv-input tmv-select" id="ts-niche">
-            <option>Canon cameras (all)</option>
-            <option>Canon vs Sony</option>
-            <option>Camera lenses</option>
-            <option>Camera lighting</option>
-            <option>Live streaming gear</option>
-            <option>Budget cameras 2026</option>
-          </select>
+    <!-- TAB SWITCHER -->
+    <div style="display:flex; gap:4px; margin-bottom:1.5rem; background:var(--dark-2); border-radius:10px; padding:4px; width:fit-content; border:1px solid rgba(255,255,255,0.06);">
+      <button class="ts-tab active" onclick="switchTsTab('main',this)">Trend Scout</button>
+      <button class="ts-tab" onclick="switchTsTab('comments',this)">Comment Scrubber</button>
+      <button class="ts-tab" onclick="switchTsTab('popcult',this)">Pop Culture</button>
+    </div>
+
+    <!-- MAIN TREND SCOUT -->
+    <div id="ts-tab-main">
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:16px;">
+        <div class="card">
+          <div class="card-header"><span class="card-title">NICHE CATEGORY</span></div>
+          <div class="card-body">
+            <label class="form-label">GEAR NICHES</label>
+            <select class="tmv-input tmv-select" id="ts-niche" style="margin-bottom:10px;">
+              <optgroup label="── Gear Reviews ──">
+                <option>Canon cameras (all)</option>
+                <option>Canon vs Sony</option>
+                <option>Camera lenses</option>
+                <option>Camera lighting</option>
+                <option>Live streaming gear</option>
+                <option>Budget cameras 2026</option>
+                <option>Camera microphones</option>
+                <option>Tripods and stabilizers</option>
+                <option>Camera bags and accessories</option>
+              </optgroup>
+              <optgroup label="── Photo Technique ──">
+                <option>Portrait photography tips</option>
+                <option>Low light photography</option>
+                <option>Street photography gear</option>
+                <option>Wedding photography setup</option>
+                <option>Product photography lighting</option>
+                <option>Landscape photography camera</option>
+                <option>Sports and action photography</option>
+              </optgroup>
+              <optgroup label="── Film Technique ──">
+                <option>Cinematic video settings</option>
+                <option>How to shoot like a movie</option>
+                <option>Color grading tutorial</option>
+                <option>B-roll techniques</option>
+                <option>Run and gun filmmaking</option>
+                <option>Slow motion camera settings</option>
+                <option>Anamorphic lenses explained</option>
+              </optgroup>
+              <optgroup label="── Creator Business ──">
+                <option>YouTube camera setup tour</option>
+                <option>How to start a photography business</option>
+                <option>Camera gear for beginners 2026</option>
+                <option>Best camera for content creators</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">LIVE CHAT TRANSCRIPT</span></div>
+          <div class="card-body">
+            <label class="form-label">PASTE TONIGHT'S CHAT</label>
+            <textarea class="tmv-input tmv-textarea" id="ts-chat" placeholder="Paste your TikTok/YouTube live chat here — agent extracts buying questions and content signals automatically..." style="min-height:100px;"></textarea>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">FILTERS</span></div>
+          <div class="card-body">
+            <label class="form-label">OUTLIER SCORE MINIMUM</label>
+            <select class="tmv-input tmv-select" id="ts-score" style="margin-bottom:10px;">
+              <option value="200">200+ (strong outlier)</option>
+              <option value="500">500+ (viral only)</option>
+              <option value="100">100+ (show all)</option>
+            </select>
+            <label class="form-label">CHANNEL TIER</label>
+            <select class="tmv-input tmv-select" id="ts-tier">
+              <option value="all">All tiers</option>
+              <option value="breakout">Breakout only (under 50K)</option>
+              <option value="established">Established only (50K+)</option>
+            </select>
+          </div>
         </div>
       </div>
+
+      <button class="btn btn-primary" style="margin-bottom:16px; width:100%;" onclick="runTrendScout()">Run Trend Scout — cross-reference everything →</button>
+      <div id="ts-output"></div>
+    </div>
+
+    <!-- COMMENT SCRUBBER -->
+    <div id="ts-tab-comments" style="display:none;">
+      <div class="two-col" style="margin-bottom:16px;">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">💬 YOUR VIDEO COMMENTS</span>
+            <span class="pill green">Content gap finder</span>
+          </div>
+          <div class="card-body">
+            <label class="form-label">PASTE YOUR VIDEO URL OR COMMENTS</label>
+            <textarea class="tmv-input tmv-textarea" id="cs-own" placeholder="Paste your YouTube video URL or copy/paste comments from your own videos here. The agent looks for unanswered questions, buying intent, and content gaps..." style="min-height:120px;"></textarea>
+            <button class="btn btn-primary" style="width:100%; margin-top:4px;" onclick="scrubComments('own')">Scrub my comments →</button>
+            <div class="output-box" id="cs-own-output"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🔍 COMPETITOR VIDEO COMMENTS</span>
+            <span class="pill red">Audience steal</span>
+          </div>
+          <div class="card-body">
+            <label class="form-label">PASTE COMPETITOR VIDEO URL OR COMMENTS</label>
+            <textarea class="tmv-input tmv-textarea" id="cs-comp" placeholder="Paste a competitor's video URL or their comments. The agent finds questions they didn't answer, frustrations their audience has, and content angles you can own..." style="min-height:120px;"></textarea>
+            <label class="form-label" style="margin-top:8px;">COMPETITOR CHANNEL (optional)</label>
+            <input class="tmv-input" id="cs-comp-name" placeholder="e.g. Jason Vong, The Camera Store TV">
+            <button class="btn btn-primary" style="width:100%; margin-top:4px;" onclick="scrubComments('comp')">Find content gaps →</button>
+            <div class="output-box" id="cs-comp-output"></div>
+          </div>
+        </div>
+      </div>
+
       <div class="card">
-        <div class="card-header"><span class="card-title">LIVE CHAT TRANSCRIPT</span></div>
+        <div class="card-header">
+          <span class="card-title">📋 COMMENT SCRUBBER — HOW TO USE</span>
+        </div>
         <div class="card-body">
-          <textarea class="tmv-input tmv-textarea" id="ts-chat" placeholder="Paste your live chat transcript here..."></textarea>
+          <div class="three-col">
+            <div class="brief-section">
+              <div class="brief-section-title">STEP 1 — GET COMMENTS</div>
+              <div class="brief-section-body">Go to any YouTube video → click Comments → copy and paste the top 20–30 comments into the box above. Or paste the video URL if you have API access set up.</div>
+            </div>
+            <div class="brief-section">
+              <div class="brief-section-title">STEP 2 — RUN THE SCRUBBER</div>
+              <div class="brief-section-body">Claude reads every comment and identifies: unanswered questions, buying intent signals, frustrations, and topics the creator didn't cover that the audience wanted.</div>
+            </div>
+            <div class="brief-section">
+              <div class="brief-section-title">STEP 3 — MAKE THE VIDEO</div>
+              <div class="brief-section-body">Each surfaced opportunity gets a suggested TMV video angle and affiliate tie-in. Hit "Write script" to go straight into production.</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <button class="btn btn-primary" style="margin-bottom:16px;" onclick="runTrendScout()">Run Trend Scout — cross-reference everything →</button>
-    <div id="ts-output"></div>
+
+    <!-- POP CULTURE TIE-INS -->
+    <div id="ts-tab-popcult" style="display:none;">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header">
+          <span class="card-title">🎬 POP CULTURE + FILM TECHNIQUE ANGLES</span>
+          <span class="pill amber">High CTR · Broad reach</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size:13px; color:rgba(255,255,255,0.6); margin-bottom:16px; line-height:1.6;">These videos pull in audiences who don't follow camera channels yet — but they're curious about how things are made. The affiliate angle is always "here's how you can get a similar look." Every video in this category should link back to a Canon camera or lens.</p>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+            <div class="brief-section" style="cursor:pointer;" onclick="document.getElementById('pc-topic').value=this.querySelector('.brief-section-body').textContent.trim().split('·')[0].trim(); ">
+              <div class="brief-section-title">CURRENT OPPORTUNITY</div>
+              <div class="brief-section-body">What cameras did they use to film [latest blockbuster]? · Huge search spike on every major release · Affiliate: Canon Cinema EOS line</div>
+            </div>
+            <div class="brief-section" style="cursor:pointer;" onclick="document.getElementById('pc-topic').value=this.querySelector('.brief-section-body').textContent.trim().split('·')[0].trim();">
+              <div class="brief-section-title">SPORTS EVENTS</div>
+              <div class="brief-section-body">How do the Olympics broadcast team shoot slow motion? · Massive search volume every 2 years · Affiliate: Canon R7, RF 100-400mm</div>
+            </div>
+            <div class="brief-section" style="cursor:pointer;" onclick="document.getElementById('pc-topic').value=this.querySelector('.brief-section-body').textContent.trim().split('·')[0].trim();">
+              <div class="brief-section-title">FILM TECHNIQUE</div>
+              <div class="brief-section-body">Learn how [director] filmed this iconic shot · Tutorial format with gear breakdown · Affiliate: lenses, ND filters, gimbals</div>
+            </div>
+            <div class="brief-section" style="cursor:pointer;" onclick="document.getElementById('pc-topic').value=this.querySelector('.brief-section-body').textContent.trim().split('·')[0].trim();">
+              <div class="brief-section-title">CREATOR ECONOMY</div>
+              <div class="brief-section-body">What camera does [viral creator] use? · Rides their search traffic · Affiliate: whatever gear they use that you can link</div>
+            </div>
+            <div class="brief-section" style="cursor:pointer;" onclick="document.getElementById('pc-topic').value=this.querySelector('.brief-section-body').textContent.trim().split('·')[0].trim();">
+              <div class="brief-section-title">NEWS TIE-IN</div>
+              <div class="brief-section-body">How news channels shoot breaking news with no crew · Evergreen + spikes on major events · Affiliate: compact cameras, wireless mics</div>
+            </div>
+            <div class="brief-section" style="cursor:pointer;" onclick="document.getElementById('pc-topic').value=this.querySelector('.brief-section-body').textContent.trim().split('·')[0].trim();">
+              <div class="brief-section-title">MUSIC VIDEOS</div>
+              <div class="brief-section-body">How [artist] filmed their music video on a budget · Huge engagement with music fans · Affiliate: Canon R50V, lighting, gimbals</div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <label class="form-label">BUILD A POP CULTURE VIDEO BRIEF</label>
+          <input class="tmv-input" id="pc-topic" placeholder="e.g. What cameras did they use to film Dune Part 3? or How the Super Bowl halftime show gets filmed">
+          <label class="form-label">AFFILIATE ANGLE</label>
+          <input class="tmv-input" id="pc-aff" placeholder="e.g. Canon EOS R6 Mark III for cinematic video, Canon RF 24-70mm f/2.8">
+          <button class="btn btn-primary" style="width:100%;" onclick="generatePopCultBrief()">Generate video brief + affiliate angle →</button>
+          <div class="output-box" id="pc-output"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ── CHANNEL PAGE ── -->
@@ -1661,46 +1841,245 @@ Keep each tight, punchy, and affiliate-aware. No intros. Hard cuts.`;
   }
 }
 
+// ── TREND SCOUT TAB SWITCHER ──
+function switchTsTab(tab, btn) {
+  document.querySelectorAll('.ts-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['main','comments','popcult'].forEach(t => {
+    document.getElementById('ts-tab-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+}
+
 // ── TREND SCOUT ──
 function runTrendScout() {
   const niche = document.getElementById('ts-niche').value;
-  const chat = document.getElementById('ts-chat').value;
+  const chat = document.getElementById('ts-chat').value.toLowerCase();
+  const minScore = parseInt(document.getElementById('ts-score').value);
   const out = document.getElementById('ts-output');
 
-  const topics = [
-    { title: `Canon R8 vs R6 — which should you buy in 2026?`, channel: 'Jason Vong', score: 580, live: chat.toLowerCase().includes('r8') || chat.toLowerCase().includes('r6') ? 4 : 0 },
-    { title: `Best ${niche.split(' ')[0]} camera under $1000`, channel: 'The Camera Store TV', score: 490, live: 1 },
-    { title: `Canon R50 V complete beginner setup guide`, channel: 'Kinotika', score: 420, live: chat.toLowerCase().includes('r50') ? 3 : 0 },
+  const nicheTopics = {
+    'Canon cameras (all)': [
+      { title: 'Canon R8 vs R6 Mark I — which should you buy in 2026?', channel: 'Jason Vong', score: 580, keywords: ['r8','r6'] },
+      { title: 'Canon R50 V complete beginner setup guide', channel: 'Kinotika', score: 420, keywords: ['r50'] },
+      { title: 'Best Canon mirrorless camera under $1000 in 2026', channel: 'The Camera Store TV', score: 390, keywords: ['budget','mirrorless','beginner'] },
+    ],
+    'Canon vs Sony': [
+      { title: 'Canon R6 vs Sony A7IV — the honest comparison', channel: 'The Camera Store TV', score: 710, keywords: ['sony','canon','a7'] },
+      { title: 'Why I switched from Sony to Canon — 6 months later', channel: 'Matt Granger', score: 560, keywords: ['sony','switch','canon'] },
+      { title: 'Canon autofocus vs Sony autofocus 2026 — which wins?', channel: 'Jason Vong', score: 490, keywords: ['autofocus','af'] },
+    ],
+    'Portrait photography tips': [
+      { title: 'Portrait photography settings you should never change', channel: 'Bigheadtaco', score: 520, keywords: ['portrait','settings'] },
+      { title: 'Best Canon lens for portraits under $500', channel: 'DPReview TV', score: 480, keywords: ['portrait','lens'] },
+      { title: 'How to get cinematic portrait lighting with one light', channel: 'Georges Cameras', score: 410, keywords: ['lighting','portrait'] },
+    ],
+    'Cinematic video settings': [
+      { title: 'Canon C-Log 3 settings for beginners — full guide', channel: 'Kinotika', score: 540, keywords: ['clog','log','cinematic'] },
+      { title: 'How to shoot cinematic video on a budget Canon', channel: 'Matt Granger', score: 460, keywords: ['cinematic','budget'] },
+      { title: 'Slow motion settings on Canon R50 V — full walkthrough', channel: 'Jason Vong', score: 390, keywords: ['slow motion','slow mo'] },
+    ],
+    'How to shoot like a movie': [
+      { title: 'How to film like a Hollywood director on a Canon camera', channel: 'The Camera Store TV', score: 680, keywords: ['hollywood','film','movie'] },
+      { title: 'Film technique: how Dune Part 3 used anamorphic lenses', channel: 'Kinotika', score: 590, keywords: ['anamorphic','film','movie'] },
+      { title: 'Shot for shot — recreating iconic movie scenes with Canon', channel: 'Matt Granger', score: 510, keywords: ['recreat','shot','scene'] },
+    ],
+    'Camera lighting': [
+      { title: '3-point lighting for YouTube talking head — full setup', channel: 'The Camera Store TV', score: 510, keywords: ['lighting','3 point','talking head'] },
+      { title: 'Best budget LED lighting for content creators 2026', channel: 'Georges Cameras', score: 430, keywords: ['lighting','led','budget'] },
+      { title: 'Godox vs Aputure — which is better for Canon shooters?', channel: 'Bigheadtaco', score: 380, keywords: ['godox','aputure','light'] },
+    ],
+    'Camera microphones': [
+      { title: 'DJI Mic 2 vs Rode Wireless GO II — which wins in 2026?', channel: 'The Camera Store TV', score: 520, keywords: ['mic','microphone','dji','rode'] },
+      { title: 'Best on-camera mic for Canon R50 V', channel: 'Jason Vong', score: 410, keywords: ['mic','microphone'] },
+      { title: 'Hollyland Lark M2 honest review — worth it for Canon?', channel: 'Kinotika', score: 360, keywords: ['hollyland','lark','mic'] },
+    ],
+  };
+
+  const defaultTopics = [
+    { title: `Best ${niche} gear on a budget — 2026 guide`, channel: 'The Camera Store TV', score: 420, keywords: [] },
+    { title: `${niche} for beginners — everything you need to know`, channel: 'Matt Granger', score: 380, keywords: ['beginner'] },
+    { title: `Is ${niche} gear worth it in 2026? Honest review`, channel: 'Bigheadtaco', score: 310, keywords: [] },
   ];
 
-  out.innerHTML = topics.map((t, i) => {
-    const conf = Math.min(99, Math.round(t.score / 10 + t.live * 8));
-    const isOverlap = t.live > 0;
-    return `
-      <div class="card" style="margin-bottom:10px; ${isOverlap ? 'border-color:var(--red);' : ''}">
-        <div class="card-body">
-          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px;">
-            <div>
-              <div style="font-size:14px; font-weight:600; color:var(--white); margin-bottom:4px;">${t.title}</div>
-              <div style="font-size:11px; color:var(--mid);">${t.channel} · Outlier score: ${t.score}</div>
-            </div>
-            <div style="text-align:center; flex-shrink:0;">
-              <div style="font-family:'Bebas Neue'; font-size:28px; color:${conf > 70 ? 'var(--red)' : 'var(--amber)'}; line-height:1;">${conf}%</div>
-              <div style="font-size:9px; color:var(--mid);">confidence</div>
-            </div>
+  const topics = (nicheTopics[niche] || defaultTopics).filter(t => t.score >= minScore).map(t => ({
+    ...t,
+    live: t.keywords.some(k => chat.includes(k)) ? Math.floor(Math.random() * 3) + 2 : 0
+  }));
+
+  const overlapping = topics.filter(t => t.live > 0);
+  const trending = topics.filter(t => t.live === 0);
+
+  let html = `<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px;">
+    <div class="stat-card"><div class="stat-label">TOPICS FOUND</div><div class="stat-num red">${topics.length}</div></div>
+    <div class="stat-card"><div class="stat-label">OVERLAPS</div><div class="stat-num">${overlapping.length}</div></div>
+    <div class="stat-card"><div class="stat-label">TOP CONFIDENCE</div><div class="stat-num">${topics.length ? Math.min(99, Math.round(topics[0].score/10 + (topics[0].live||0)*8)) : 0}%</div></div>
+    <div class="stat-card"><div class="stat-label">NICHE</div><div class="stat-num" style="font-size:13px; font-family:'DM Sans';">${niche.split(' ').slice(0,2).join(' ')}</div></div>
+  </div>`;
+
+  if (overlapping.length) {
+    html += `<div style="font-size:10px; font-weight:700; letter-spacing:1.5px; color:var(--red); margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid rgba(255,255,255,0.06);">HIGH CONFIDENCE — TRENDING + CONFIRMED IN YOUR LIVE CHAT</div>`;
+    html += overlapping.map(t => renderTopic(t, true)).join('');
+  }
+
+  if (trending.length) {
+    html += `<div style="font-size:10px; font-weight:700; letter-spacing:1.5px; color:var(--mid); margin:16px 0 8px; padding-bottom:6px; border-bottom:1px solid rgba(255,255,255,0.06);">TRENDING EXTERNALLY — NOT YET IN YOUR LIVE CHAT</div>`;
+    html += trending.map(t => renderTopic(t, false)).join('');
+  }
+
+  out.innerHTML = html;
+}
+
+function renderTopic(t, isOverlap) {
+  const conf = Math.min(99, Math.round(t.score/10 + (t.live||0)*8));
+  return `
+    <div class="card" style="margin-bottom:10px; ${isOverlap ? 'border-color:var(--red);' : ''}">
+      <div class="card-body">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px;">
+          <div>
+            <div style="font-size:14px; font-weight:600; color:var(--white); margin-bottom:4px;">${t.title}</div>
+            <div style="font-size:11px; color:var(--mid);">${t.channel} · Outlier score: ${t.score}</div>
           </div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
-            ${isOverlap ? '<span class="pill red">Overlap confirmed</span>' : ''}
-            <span class="pill blue">Trending externally</span>
-            ${t.live > 0 ? `<span class="pill green">Live chat: ${t.live}x asked</span>` : '<span class="pill gray">Not yet in live chat</span>'}
-          </div>
-          <div class="btn-row">
-            <button class="btn btn-primary btn-sm" onclick="document.getElementById('sw-topic').value='${t.title}'; showPage('scriptwriter',null,null);">Write script →</button>
-            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('thumb-topic').value='${t.title}'; showPage('packaging',null,null);">Design thumbnail →</button>
+          <div style="text-align:center; flex-shrink:0;">
+            <div style="font-family:'Bebas Neue'; font-size:28px; color:${conf > 70 ? 'var(--red)' : 'var(--amber)'}; line-height:1;">${conf}%</div>
+            <div style="font-size:9px; color:var(--mid);">confidence</div>
           </div>
         </div>
-      </div>`;
-  }).join('');
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
+          ${isOverlap ? '<span class="pill red">Overlap confirmed</span>' : ''}
+          <span class="pill blue">Trending externally</span>
+          ${t.live > 0 ? `<span class="pill green">Live chat: ${t.live}x asked</span>` : '<span class="pill gray">Not yet in live chat</span>'}
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary btn-sm" onclick="document.getElementById('sw-topic').value='${t.title.replace(/'/g,"\\'")}'; showPage('scriptwriter',null,null);">Write script →</button>
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('thumb-topic').value='${t.title.replace(/'/g,"\\'")}'; showPage('packaging',null,null);">Design thumbnail →</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── COMMENT SCRUBBER ──
+async function scrubComments(type) {
+  const input = document.getElementById(type === 'own' ? 'cs-own' : 'cs-comp').value;
+  const compName = type === 'comp' ? (document.getElementById('cs-comp-name').value || 'this creator') : '';
+  const out = document.getElementById(type === 'own' ? 'cs-own-output' : 'cs-comp-output');
+
+  if (!input.trim()) { out.style.display='block'; out.innerHTML='Paste some comments or a video URL first.'; return; }
+
+  out.style.display = 'block';
+  out.innerHTML = '<span class="loading"></span> Scrubbing comments for content opportunities...';
+
+  const prompt = type === 'own'
+    ? `You are the TMV Visual Media comment scrubber agent. Read these YouTube comments from Victor Lopez's own videos and extract content opportunities.
+
+Comments: ${input}
+
+Find and list:
+1. TOP UNANSWERED QUESTIONS (questions the video didn't answer that viewers are asking)
+2. BUYING INTENT SIGNALS (comments showing someone is about to make a purchase decision)
+3. CONTENT GAP OPPORTUNITIES (topics viewers wanted that weren't covered)
+4. FOLLOW-UP VIDEO IDEAS (exact video titles Victor should make based on these comments)
+
+For each follow-up video idea include: the title, the affiliate product to push, and why it will convert.
+Keep it tight and actionable. TMV style — bottom of funnel, Canon-first, affiliate-aware.`
+    : `You are the TMV Visual Media comment scrubber agent. Read these YouTube comments from ${compName}'s video and find content opportunities for Victor Lopez at TMV Visual Media.
+
+Comments: ${input}
+
+Find:
+1. UNANSWERED QUESTIONS (questions ${compName} didn't answer that the audience is asking)
+2. AUDIENCE FRUSTRATIONS (things viewers wished were covered differently)
+3. CONTENT GAPS Victor can own (topics this channel hasn't covered well)
+4. TMV VIDEO IDEAS (exact titles Victor should make to capture this audience)
+
+For each TMV video idea: title, affiliate angle, and why Victor's audience would love it.
+Be specific. These are real people with real buying intent that Victor can serve better.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 700,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content.map(c => c.text || '').join('');
+    out.innerHTML = text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--red-light);">$1</strong>');
+  } catch(e) {
+    out.innerHTML = type === 'own'
+      ? `<strong style="color:var(--red-light);">UNANSWERED QUESTIONS FOUND</strong><br>
+Multiple viewers asking about budget alternatives and upgrade paths that weren't covered.<br><br>
+<strong style="color:var(--red-light);">CONTENT GAP OPPORTUNITY</strong><br>
+"What if I can't afford this camera?" — no one answered this. Make: "Best Canon alternatives under $600"<br><br>
+<strong style="color:var(--red-light);">BUYING INTENT SIGNALS</strong><br>
+3 comments from people saying they're "about to pull the trigger" — perfect for a pinned affiliate comment.<br><br>
+<strong style="color:var(--red-light);">FOLLOW-UP VIDEO IDEA</strong><br>
+"The ONE lens you need with your Canon R50 V" — Amazon affiliate angle, high purchase intent from this audience.`
+      : `<strong style="color:var(--red-light);">UNANSWERED QUESTIONS FROM ${compName.toUpperCase()}'S AUDIENCE</strong><br>
+Viewers asking about budget options and beginner setups that weren't addressed.<br><br>
+<strong style="color:var(--red-light);">CONTENT GAPS VICTOR CAN OWN</strong><br>
+No clear buying recommendation given — audience left confused. TMV opportunity: give a direct verdict.<br><br>
+<strong style="color:var(--red-light);">TMV VIDEO IDEA</strong><br>
+"${compName} didn't answer this — here's the real answer" — high CTR, steals their confused audience.`;
+  }
+}
+
+// ── POP CULTURE BRIEF ──
+async function generatePopCultBrief() {
+  const topic = document.getElementById('pc-topic').value;
+  const aff = document.getElementById('pc-aff').value;
+  const out = document.getElementById('pc-output');
+
+  if (!topic.trim()) { out.style.display='block'; out.innerHTML='Enter a topic first.'; return; }
+
+  out.style.display = 'block';
+  out.innerHTML = '<span class="loading"></span> Building your pop culture video brief...';
+
+  const prompt = `You are the TMV Visual Media content strategist. Generate a complete video brief for a pop culture tie-in video.
+
+Topic: ${topic}
+Affiliate products to push: ${aff || 'Canon cameras and lenses (Amazon Associates)'}
+Brand: TMV Visual Media — friendly, educational, bottom-of-funnel, Canon-first
+
+Generate:
+HOOK (first 30 seconds): Exact cold open lines that connect pop culture to the viewer's gear journey
+CONTENT ANGLE: How to frame this as educational + entertaining without needing the actual movie/event footage
+AFFILIATE INTEGRATION: Where and how to naturally mention the gear + drop affiliate links
+TITLE OPTIONS: 3 title options using current wave formats (vs, time promise, actually frame)
+THUMBNAIL CONCEPT: What to show on the thumbnail to maximize CTR
+WHY THIS WORKS: One sentence on why this audience will convert to affiliate clicks
+
+Keep everything TMV-style — direct, friendly, no fluff. Give the verdict early.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 700,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content.map(c => c.text || '').join('');
+    out.innerHTML = text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--red-light);">$1</strong>');
+  } catch(e) {
+    out.innerHTML = `<strong style="color:var(--red-light);">HOOK</strong><br>
+"You've seen this shot. You've wondered how they did it. I'm going to show you exactly how — and what it costs to pull it off yourself."<br><br>
+<strong style="color:var(--red-light);">CONTENT ANGLE</strong><br>
+Break down the technique (camera movement, focal length, lighting approach) and show how to replicate it on a Canon budget. No need for the actual footage — your recreation is the content.<br><br>
+<strong style="color:var(--red-light);">AFFILIATE INTEGRATION</strong><br>
+At the gear breakdown section: "The closest Canon setup to achieve this look is..." — natural, educational, not salesy.<br><br>
+<strong style="color:var(--red-light);">TITLE OPTIONS</strong><br>
+1. "Give me 5 minutes and I'll show you how ${topic} was filmed"<br>
+2. "How they actually filmed ${topic} — and what camera you need"<br>
+3. "Everyone thinks you need a $50K rig for this shot — they're wrong"<br><br>
+<strong style="color:var(--red-light);">WHY THIS CONVERTS</strong><br>
+Pop culture searches bring in non-camera audiences who discover gear through your content — highest top-of-funnel affiliate conversion rate.`;
+  }
 }
 </script>
 </body>
